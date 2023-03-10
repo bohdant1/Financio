@@ -25,9 +25,9 @@ jobs:
           working_directory: Financio
           name: Build Docker image
           command: |
-            docker build -t btymo/btymo-repo:latest .
+            docker build -t btymo/btymo-repo:backend .
             docker login --username=btymo --password=$DOCKERHUB_PASSWORD
-            docker push btymo/btymo-repo:latest  
+            docker push btymo/btymo-repo:backend  
 workflows:
   workflow: 
     jobs:
