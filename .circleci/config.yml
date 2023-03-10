@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: circle-ci-test/circle-ci-test
+          working_directory: Financio/Financio
           name: build solution
           command: | 
             dotnet restore
@@ -22,7 +22,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          working_directory: circle-ci-test
+          working_directory: Financio
           name: Build Docker image
           command: |
             docker build -t btymo/btymo-repo:latest .
