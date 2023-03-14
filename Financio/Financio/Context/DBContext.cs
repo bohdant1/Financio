@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
-namespace Financio.Entities
+namespace Financio
 {
     public class DBContext
     {

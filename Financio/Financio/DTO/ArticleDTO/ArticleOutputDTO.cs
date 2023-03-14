@@ -1,4 +1,4 @@
-﻿namespace Financio.DTO.ArticleDTO
+﻿namespace Financio
 {
     public class ArticleOutputDTO
     {
