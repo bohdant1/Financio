@@ -1,0 +1,37 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.2.0
+
+jobs:
+  build:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    steps:
+      - checkout
+      - run:
+          working_directory: Financio/Financio
+          name: build solution
+          command: | 
+            dotnet restore
+            dotnet build
+  build-and-push-image:
+    docker:
+      - image: docker:20.10.11
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          working_directory: Financio
+          name: Build Docker image
+          command: |
+            docker build -t btymo/btymo-repo:backend .
+            docker login --username=btymo --password=$DOCKERHUB_PASSWORD
+            docker push btymo/btymo-repo:backend  
+workflows:
+  workflow: 
+    jobs:
+      - build
+      - build-and-push-image:
+          requires: 
+            - build
