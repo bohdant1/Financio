@@ -1,4 +1,10 @@
 var builder = WebApplication.CreateBuilder(args);
+// Logging 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(options => 
+{
+    options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+});
 
 // Add services to the container.
 
