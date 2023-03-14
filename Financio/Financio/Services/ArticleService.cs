@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Financio.Controllers;
 using Microsoft.EntityFrameworkCore;
 
-namespace Financio.Services
+namespace Financio
 {
     public class ArticleService
     {
