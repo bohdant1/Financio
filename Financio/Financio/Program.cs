@@ -1,3 +1,5 @@
+using Financio;
+
 var builder = WebApplication.CreateBuilder(args);
 // Logging 
 builder.Logging.ClearProviders();
@@ -8,10 +10,19 @@ builder.Logging.AddConsole(options =>
 
 // Add services to the container.
 
+builder.Services.Configure<DBContext>(
+    builder.Configuration.GetSection("MongoDb"));
+
+
+builder.Services.AddScoped<DBContext>();
+builder.Services.AddScoped<ArticleService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

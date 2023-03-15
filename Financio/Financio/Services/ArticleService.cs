@@ -20,6 +20,7 @@ namespace Financio
         public ArticleOutputDTO CreateArticle(ArticleInputDTO articleInputDTO)
         {
             var article_entity = _mapper.Map<Article>(articleInputDTO);
+            article_entity.Date = DateTime.Now;
 
             _context.Articles.InsertOne(article_entity);
 
@@ -71,7 +72,7 @@ namespace Financio
 
             _logger.LogInformation($"Retrived all articles");
 
-            return articleDTOs;
+            return articleDTOs; 
         }
 
         public ArticleOutputDTO GetArticleByID(string id)
@@ -79,12 +80,8 @@ namespace Financio
             var objectId = ObjectId.Parse(id);
 
             var article = _context.Articles.Find(x => x.Id == id).FirstOrDefault();
-            if (article == null)
-            {
-                throw new Exception("Article does not exist");
-            }
 
-            _logger.LogInformation($"Retrieved article by id");
+            _logger.LogInformation($"Retrieved article by id {id}");
             return _mapper.Map<ArticleOutputDTO>(article);
         }
     }

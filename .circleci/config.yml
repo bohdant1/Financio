@@ -31,7 +31,15 @@ jobs:
 workflows:
   workflow: 
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only: 
+                - main
       - build-and-push-image:
+          filters:
+            branches:
+              only: 
+                - main
           requires: 
             - build
