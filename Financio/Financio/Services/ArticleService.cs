@@ -72,7 +72,7 @@ namespace Financio
 
             _logger.LogInformation($"Retrived all articles");
 
-            return articleDTOs;
+            return articleDTOs; 
         }
 
         public ArticleOutputDTO GetArticleByID(string id)
