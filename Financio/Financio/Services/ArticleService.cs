@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper.QueryableExtensions;
 
 namespace Financio
 {
@@ -60,10 +60,19 @@ namespace Financio
 
         public List<ArticleOutputDTO> GetAllArticles()
         {
-            IEnumerable<Article> articles = _context.Articles.Find(_ => true).ToList();
+            var articles = _context.Articles.AsQueryable();
+            var collections = _context.Collections.AsQueryable();
+
+            var articlesWithCollections = articles.ToList()
+                .Select(a => {
+                    a.Collections = collections.Where(c => a.CollectionIds.Contains(c.Id)).ToList();
+                    return a;
+                }).ToList();
+
+
             List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
 
-            foreach (var article in articles)
+            foreach (var article in articlesWithCollections)
             {
                 var articleDTO = _mapper.Map<ArticleOutputDTO>(article);
 

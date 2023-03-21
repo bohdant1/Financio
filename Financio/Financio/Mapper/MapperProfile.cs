@@ -8,6 +8,8 @@ namespace Financio
         {
             CreateMap<ArticleInputDTO, Article>().ReverseMap();
             CreateMap<Article, ArticleOutputDTO>().ReverseMap();
+            CreateMap<Collection, CollectionOutputDTO>().ReverseMap();
+            CreateMap<CollectionInputDTO, Collection>().ReverseMap();
         }
     }
 }
