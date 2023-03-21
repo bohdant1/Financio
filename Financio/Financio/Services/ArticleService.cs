@@ -33,10 +33,10 @@ namespace Financio
 
         public ArticleOutputDTO UpdateArticle(ArticleInputDTO articleInputDTO, string id)
         {
+            //TODO FIX DATETIME PROBLEM
             var objectId = ObjectId.Parse(id);
             var article_entity = _mapper.Map<Article>(articleInputDTO);
             article_entity.Id = id;
-
 
             _context.Articles.ReplaceOne(x => x.Id == id, article_entity);
 
@@ -88,10 +88,17 @@ namespace Financio
         {
             var objectId = ObjectId.Parse(id);
 
-            var article = _context.Articles.Find(x => x.Id == id).FirstOrDefault();
+            var articles = _context.Articles.AsQueryable();
+            var collections = _context.Collections.AsQueryable();
+
+            var articleWithCollections = articles.Where(a => a.Id == id).FirstOrDefault();
+            if (articleWithCollections != null)
+            {
+                articleWithCollections.Collections = collections.Where(c => articleWithCollections.CollectionIds.Contains(c.Id)).ToList();
+            }
 
             _logger.LogInformation($"Retrieved article by id {id}");
-            return _mapper.Map<ArticleOutputDTO>(article);
+            return _mapper.Map<ArticleOutputDTO>(articleWithCollections);
         }
     }
 }
