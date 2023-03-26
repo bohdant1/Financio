@@ -29,7 +29,9 @@ namespace Financio
             //TODO: research how to make them synchronous
             //TODO: add logging
 
-            _blobContext.Upload(article_entity.Text, article_entity.Id);
+            var uri = _blobContext.Upload(article_entity.Text, article_entity.Id);
+
+            article_entity.Text = uri;
 
             _mongoContext.Articles.InsertOne(article_entity);
 

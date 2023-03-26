@@ -24,7 +24,7 @@ namespace Financio
         }
 
 
-        public void Upload(string content, string id) 
+        public string Upload(string content, string id) 
         {
             var blobServiceClient = new BlobServiceClient(connectionString);
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
@@ -34,6 +34,7 @@ namespace Financio
             {
                 blobClient.Upload(stream);
             }
+            return blobClient.Uri.ToString();
         }
     }
 }
