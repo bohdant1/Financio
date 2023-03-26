@@ -13,8 +13,12 @@ builder.Logging.AddConsole(options =>
 builder.Services.Configure<DBContext>(
     builder.Configuration.GetSection("MongoDb"));
 
+builder.Services.Configure<BlobStorageContext>(
+    builder.Configuration.GetSection("BlobStorage"));
+
 
 builder.Services.AddScoped<DBContext>();
+builder.Services.AddScoped<BlobStorageContext>();
 builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<CollectionService>();
 

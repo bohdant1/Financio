@@ -7,13 +7,16 @@ namespace Financio
 {
     public class ArticleService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _mongoContext;
+        private readonly BlobStorageContext _blobContext;
         private readonly IMapper _mapper;
         private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(DBContext context, IMapper mapper, ILogger<ArticleService> logger) 
+        public ArticleService(DBContext context, BlobStorageContext blobContext, IMapper mapper, ILogger<ArticleService> logger) 
         {
-            this._context = context;
+            this._mongoContext = context;
+            this._blobContext = blobContext;
+            this._blobContext.SetContainer("Article");
             this._mapper = mapper;
             this._logger = logger;
         }
@@ -21,8 +24,11 @@ namespace Financio
         {
             var article_entity = _mapper.Map<Article>(articleInputDTO);
             article_entity.Date = DateTime.Now;
+            article_entity.Id = ObjectId.GenerateNewId().ToString();
 
-            _context.Articles.InsertOne(article_entity);
+            _blobContext.Upload(article_entity.Text, article_entity.Id);
+
+            _mongoContext.Articles.InsertOne(article_entity);
 
             var result = _mapper.Map<ArticleOutputDTO>(article_entity);
 
@@ -38,7 +44,7 @@ namespace Financio
             var article_entity = _mapper.Map<Article>(articleInputDTO);
             article_entity.Id = id;
 
-            _context.Articles.ReplaceOne(x => x.Id == id, article_entity);
+            _mongoContext.Articles.ReplaceOne(x => x.Id == id, article_entity);
 
             var result = _mapper.Map<ArticleOutputDTO>(article_entity);
 
@@ -51,7 +57,7 @@ namespace Financio
         {
             var objectId = ObjectId.Parse(id);
 
-            DeleteResult result = _context.Articles.DeleteOne(x => x.Id == id);
+            DeleteResult result = _mongoContext.Articles.DeleteOne(x => x.Id == id);
 
             _logger.LogInformation($"Deleted {result.DeletedCount} article(s) with {id}");
 
@@ -60,8 +66,8 @@ namespace Financio
 
         public List<ArticleOutputDTO> GetAllArticles()
         {
-            var articles = _context.Articles.AsQueryable();
-            var collections = _context.Collections.AsQueryable();
+            var articles = _mongoContext.Articles.AsQueryable();
+            var collections = _mongoContext.Collections.AsQueryable();
 
             var articlesWithCollections = articles.ToList()
                 .Select(a => {
@@ -88,8 +94,8 @@ namespace Financio
         {
             var objectId = ObjectId.Parse(id);
 
-            var articles = _context.Articles.AsQueryable();
-            var collections = _context.Collections.AsQueryable();
+            var articles = _mongoContext.Articles.AsQueryable();
+            var collections = _mongoContext.Collections.AsQueryable();
 
             var articleWithCollections = articles.Where(a => a.Id == id).FirstOrDefault();
             if (articleWithCollections != null)
