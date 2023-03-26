@@ -26,6 +26,9 @@ namespace Financio
             article_entity.Date = DateTime.Now;
             article_entity.Id = ObjectId.GenerateNewId().ToString();
 
+            //TODO: research how to make them synchronous
+            //TODO: add logging
+
             _blobContext.Upload(article_entity.Text, article_entity.Id);
 
             _mongoContext.Articles.InsertOne(article_entity);

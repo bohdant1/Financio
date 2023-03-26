@@ -31,8 +31,6 @@ namespace Financio
             return Ok(article);
         }
 
-
-
         [HttpPost("Create")]
         public async Task<ActionResult> Create(ArticleInputDTO article)
         {

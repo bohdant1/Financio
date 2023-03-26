@@ -1,6 +1,20 @@
 using Financio;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            //you can configure your custom policy
+            builder.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
+
 // Logging 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole(options => 
@@ -15,6 +29,8 @@ builder.Services.Configure<DBContext>(
 
 builder.Services.Configure<BlobStorageContext>(
     builder.Configuration.GetSection("BlobStorage"));
+
+
 
 
 builder.Services.AddScoped<DBContext>();
@@ -37,7 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
