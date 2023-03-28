@@ -95,21 +95,35 @@ namespace Financio
             return articleDTOs; 
         }
 
+        public List<ArticleOutputDTO> GetAllArticlesFromCollection(string collection_id)
+        {
+            var articles = _mongoContext.Articles.Find(x => x.CollectionIds.Contains(collection_id)).ToList();
+
+            List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
+
+            foreach (var article in articles)
+            {
+                var articleDTO = _mapper.Map<ArticleOutputDTO>(article);
+
+                articleDTOs.Add(articleDTO);
+            }
+
+            _logger.LogInformation($"Retrived all articles from collection {collection_id}");
+
+            return articleDTOs;
+        }
+
         public ArticleOutputDTO GetArticleByID(string id)
         {
             var objectId = ObjectId.Parse(id);
 
-            var articles = _mongoContext.Articles.AsQueryable();
-            var collections = _mongoContext.Collections.AsQueryable();
+            var article_entity = _mongoContext.Articles.Find(x => x.Id == id).FirstOrDefault();
 
-            var articleWithCollections = articles.Where(a => a.Id == id).FirstOrDefault();
-            if (articleWithCollections != null)
-            {
-                articleWithCollections.Collections = collections.Where(c => articleWithCollections.CollectionIds.Contains(c.Id)).ToList();
-            }
+            string content = _blobContext.Fetch(article_entity.Text);
+            article_entity.Text = content;
 
             _logger.LogInformation($"Retrieved article by id {id}");
-            return _mapper.Map<ArticleOutputDTO>(articleWithCollections);
+            return _mapper.Map<ArticleOutputDTO>(article_entity);
         }
     }
 }

@@ -31,6 +31,13 @@ namespace Financio
             return Ok(article);
         }
 
+        [HttpGet("GetAllByCollection/{id}")]
+        public async Task<ActionResult<ArticleOutputDTO>> GetAllByCollection(string id)
+        {
+            var articles = _articleService.GetAllArticles();
+            return Ok(articles);
+        }
+
         [HttpPost("Create")]
         public async Task<ActionResult> Create(ArticleInputDTO article)
         {
@@ -39,8 +46,6 @@ namespace Financio
             return Ok(result.Id != null ? result : false);
         }
 
-
-
         [HttpPut("Update/{id}")]
         public async Task<ActionResult> Update(ArticleInputDTO article, string id)
         {
@@ -48,8 +53,6 @@ namespace Financio
 
             return Ok(result != null ? result : false);
         }
-
-
 
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult> Delete(string id)

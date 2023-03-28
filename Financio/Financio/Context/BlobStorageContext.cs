@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Text;
@@ -35,6 +37,25 @@ namespace Financio
                 blobClient.Upload(stream);
             }
             return blobClient.Uri.ToString();
+        }
+
+        public string Fetch(string uri)
+        {
+            var blobServiceClient = new BlobServiceClient(connectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            Uri blobUri = new Uri(uri);
+            string blobName = blobUri.Segments[2];
+            var blobClient = containerClient.GetBlobClient(blobName);
+            byte[] result = null;
+            if (blobClient.ExistsAsync().Result)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    blobClient.DownloadTo(ms);
+                    result = ms.ToArray();
+                }
+            }
+            return Encoding.UTF8.GetString(result); ;
         }
     }
 }
