@@ -1,19 +1,22 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper.QueryableExtensions;
 
 namespace Financio
 {
     public class ArticleService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _mongoContext;
+        private readonly BlobStorageContext _blobContext;
         private readonly IMapper _mapper;
         private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(DBContext context, IMapper mapper, ILogger<ArticleService> logger) 
+        public ArticleService(DBContext context, BlobStorageContext blobContext, IMapper mapper, ILogger<ArticleService> logger) 
         {
-            this._context = context;
+            this._mongoContext = context;
+            this._blobContext = blobContext;
+            this._blobContext.SetContainer("Article");
             this._mapper = mapper;
             this._logger = logger;
         }
@@ -21,8 +24,16 @@ namespace Financio
         {
             var article_entity = _mapper.Map<Article>(articleInputDTO);
             article_entity.Date = DateTime.Now;
+            article_entity.Id = ObjectId.GenerateNewId().ToString();
 
-            _context.Articles.InsertOne(article_entity);
+            //TODO: research how to make them synchronous
+            //TODO: add logging
+
+            var uri = _blobContext.Upload(article_entity.Text, article_entity.Id);
+
+            article_entity.Text = uri;
+
+            _mongoContext.Articles.InsertOne(article_entity);
 
             var result = _mapper.Map<ArticleOutputDTO>(article_entity);
 
@@ -33,12 +44,12 @@ namespace Financio
 
         public ArticleOutputDTO UpdateArticle(ArticleInputDTO articleInputDTO, string id)
         {
+            //TODO FIX DATETIME PROBLEM
             var objectId = ObjectId.Parse(id);
             var article_entity = _mapper.Map<Article>(articleInputDTO);
             article_entity.Id = id;
 
-
-            _context.Articles.ReplaceOne(x => x.Id == id, article_entity);
+            _mongoContext.Articles.ReplaceOne(x => x.Id == id, article_entity);
 
             var result = _mapper.Map<ArticleOutputDTO>(article_entity);
 
@@ -51,7 +62,7 @@ namespace Financio
         {
             var objectId = ObjectId.Parse(id);
 
-            DeleteResult result = _context.Articles.DeleteOne(x => x.Id == id);
+            DeleteResult result = _mongoContext.Articles.DeleteOne(x => x.Id == id);
 
             _logger.LogInformation($"Deleted {result.DeletedCount} article(s) with {id}");
 
@@ -60,10 +71,19 @@ namespace Financio
 
         public List<ArticleOutputDTO> GetAllArticles()
         {
-            IEnumerable<Article> articles = _context.Articles.Find(_ => true).ToList();
+            var articles = _mongoContext.Articles.AsQueryable();
+            var collections = _mongoContext.Collections.AsQueryable();
+
+            var articlesWithCollections = articles.ToList()
+                .Select(a => {
+                    a.Collections = collections.Where(c => a.CollectionIds.Contains(c.Id)).ToList();
+                    return a;
+                }).ToList();
+
+
             List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
 
-            foreach (var article in articles)
+            foreach (var article in articlesWithCollections)
             {
                 var articleDTO = _mapper.Map<ArticleOutputDTO>(article);
 
@@ -75,14 +95,35 @@ namespace Financio
             return articleDTOs; 
         }
 
+        public List<ArticleOutputDTO> GetAllArticlesFromCollection(string collection_id)
+        {
+            var articles = _mongoContext.Articles.Find(x => x.CollectionIds.Contains(collection_id)).ToList();
+
+            List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
+
+            foreach (var article in articles)
+            {
+                var articleDTO = _mapper.Map<ArticleOutputDTO>(article);
+
+                articleDTOs.Add(articleDTO);
+            }
+
+            _logger.LogInformation($"Retrived all articles from collection {collection_id}");
+
+            return articleDTOs;
+        }
+
         public ArticleOutputDTO GetArticleByID(string id)
         {
             var objectId = ObjectId.Parse(id);
 
-            var article = _context.Articles.Find(x => x.Id == id).FirstOrDefault();
+            var article_entity = _mongoContext.Articles.Find(x => x.Id == id).FirstOrDefault();
+
+            string content = _blobContext.Fetch(article_entity.Text);
+            article_entity.Text = content;
 
             _logger.LogInformation($"Retrieved article by id {id}");
-            return _mapper.Map<ArticleOutputDTO>(article);
+            return _mapper.Map<ArticleOutputDTO>(article_entity);
         }
     }
 }

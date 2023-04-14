@@ -10,9 +10,10 @@ namespace Financio
             var database = client.GetDatabase(configuration.GetValue<string>("MongoDb:DatabaseName"));
 
             Articles = database.GetCollection<Article>("Articles");
-
+            Collections = database.GetCollection<Collection>("Collections");
         }
 
         public IMongoCollection<Article> Articles { get; }
+        public IMongoCollection<Collection> Collections { get; }
     }
 }
