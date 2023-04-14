@@ -6,6 +6,6 @@
         public string Title { get; set; }
         public string Date { get; set; }
         public string Text { get; set; }
-        public List<Collection> Collections { get; set; }
+        public Collection Collection { get; set; }
     }
 }

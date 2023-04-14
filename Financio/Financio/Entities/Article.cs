@@ -12,8 +12,8 @@ namespace Financio
         public DateTime Date { get; set; }
         public string Text { get; set; }
         [BsonRepresentation(BsonType.ObjectId)]
-        public List<string> CollectionIds { get; set; }
+        public string CollectionId { get; set; }
         [BsonIgnore]
-        public List<Collection> Collections { get; set; }
+        public Collection Collection { get; set; }
     }
 }
