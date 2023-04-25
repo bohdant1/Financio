@@ -34,7 +34,7 @@ namespace Financio
         [HttpGet("GetAllByCollection/{id}")]
         public async Task<ActionResult<ArticleOutputDTO>> GetAllByCollection(string id)
         {
-            var articles = _articleService.GetAllArticles();
+            var articles = _articleService.GetAllArticlesFromCollection(id);
             return Ok(articles);
         }
 

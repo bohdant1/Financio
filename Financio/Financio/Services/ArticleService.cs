@@ -76,7 +76,7 @@ namespace Financio
 
             var articlesWithCollections = articles.ToList()
                 .Select(a => {
-                    a.Collections = collections.Where(c => a.CollectionIds.Contains(c.Id)).ToList();
+                    a.Collection = collections.Where(c => c.Id == a.CollectionId).FirstOrDefault();
                     return a;
                 }).ToList();
 
@@ -97,7 +97,7 @@ namespace Financio
 
         public List<ArticleOutputDTO> GetAllArticlesFromCollection(string collection_id)
         {
-            var articles = _mongoContext.Articles.Find(x => x.CollectionIds.Contains(collection_id)).ToList();
+            var articles = _mongoContext.Articles.Find(x => x.CollectionId == collection_id).ToList();
 
             List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
 
