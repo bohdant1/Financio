@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Financio.Entities;
+using MongoDB.Driver;
 
 namespace Financio
 {
@@ -15,9 +16,11 @@ namespace Financio
 
             Articles = database.GetCollection<Article>("Articles");
             Collections = database.GetCollection<Collection>("Collections");
+            Users = database.GetCollection<User>("Users");
         }
 
         public IMongoCollection<Article> Articles { get; }
         public IMongoCollection<Collection> Collections { get; }
+        public IMongoCollection<User> Users { get; }
     }
 }
