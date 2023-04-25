@@ -6,7 +6,11 @@ namespace Financio
     {
         public DBContext(IConfiguration configuration)
         {
-            var client = new MongoClient(configuration.GetValue<string>("MongoDb:ConnectionString"));
+            string connectionUri = configuration.GetValue<string>("MongoDb:ConnectionString");
+            var settings = MongoClientSettings.FromConnectionString(connectionUri);
+            // Set the ServerApi field of the settings object to Stable API version 1
+            settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+            var client = new MongoClient(settings);
             var database = client.GetDatabase(configuration.GetValue<string>("MongoDb:DatabaseName"));
 
             Articles = database.GetCollection<Article>("Articles");

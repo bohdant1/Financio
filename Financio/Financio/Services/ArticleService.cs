@@ -97,7 +97,7 @@ namespace Financio
 
         public List<ArticleOutputDTO> GetAllArticlesFromCollection(string collection_id)
         {
-            var articles = _mongoContext.Articles.Find(x => x.CollectionId.Contains(collection_id)).ToList();
+            var articles = _mongoContext.Articles.Find(x => x.CollectionId == collection_id).ToList();
 
             List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
 
