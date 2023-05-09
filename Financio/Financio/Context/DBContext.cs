@@ -1,4 +1,4 @@
-﻿using Financio.Entities;
+﻿using Financio;
 using MongoDB.Driver;
 
 namespace Financio
