@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Linq;
 
 namespace Financio
 {
@@ -42,7 +43,14 @@ namespace Financio
 
             if (user_entity != null)
             {
-                user_entity.LikedArticles.Add(article);
+                if (user_entity.LikedArticles.Any(x => x == article)) 
+                {
+                    user_entity.LikedArticles.Remove(article);
+                }
+                else 
+                {
+                    user_entity.LikedArticles.Add(article);
+                }
                 _mongoContext.Users.ReplaceOne(u => u.Id == userID, user_entity);
                 return true;
             }

@@ -37,6 +37,7 @@ builder.Services.AddScoped<DBContext>();
 builder.Services.AddScoped<BlobStorageContext>();
 builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<CollectionService>();
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

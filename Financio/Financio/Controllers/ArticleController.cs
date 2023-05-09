@@ -7,11 +7,13 @@ namespace Financio
     public class ArticleController : ControllerBase
     {
         private readonly ArticleService _articleService;
+        private readonly UserService _userService;
 
 
-        public ArticleController(ArticleService articleService)
+        public ArticleController(ArticleService articleService, UserService userService)
         {
             _articleService = articleService;
+            _userService = userService;
         }
 
         [HttpGet("GetAll")]
@@ -52,6 +54,14 @@ namespace Financio
             var result = _articleService.UpdateArticle(article, id);
 
             return Ok(result != null ? result : false);
+        }
+
+        [HttpPost("Like")]
+        public async Task<ActionResult> Like(UserLikeDTO likeDTO)
+        {
+            var result = _userService.AssignLikedArticleToUser(likeDTO.ArticleID, likeDTO.UserID);
+
+            return Ok(result);
         }
 
         [HttpDelete("Delete/{id}")]
