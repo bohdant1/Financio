@@ -33,6 +33,16 @@ namespace Financio
             return Ok(article);
         }
 
+        [HttpGet("GetByIdForUser/{articleID}/{userID}")]
+        public async Task<ActionResult<ArticleOutputDTO>> GetByIdForUser(string articleID, string userID)
+        {
+            var article = _articleService.GetArticleByIDForUser(articleID, userID);
+            if (article == null)
+                return NotFound();
+
+            return Ok(article);
+        }
+
         [HttpGet("GetAllByCollection/{id}")]
         public async Task<ActionResult<ArticleOutputDTO>> GetAllByCollection(string id)
         {

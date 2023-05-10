@@ -35,6 +35,7 @@ builder.Services.Configure<BlobStorageContext>(
 
 builder.Services.AddScoped<DBContext>();
 builder.Services.AddScoped<BlobStorageContext>();
+builder.Services.AddScoped<MessageBrokerContext>();
 builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<CollectionService>();
 builder.Services.AddScoped<UserService>();
