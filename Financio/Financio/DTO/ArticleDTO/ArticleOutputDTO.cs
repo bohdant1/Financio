@@ -8,5 +8,6 @@
         public string Text { get; set; }
         public string Description { get; set; }
         public Collection Collection { get; set; }
+        public bool LikedByUser { get; set; }
     }
 }

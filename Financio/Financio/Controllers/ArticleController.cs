@@ -7,11 +7,13 @@ namespace Financio
     public class ArticleController : ControllerBase
     {
         private readonly ArticleService _articleService;
+        private readonly UserService _userService;
 
 
-        public ArticleController(ArticleService articleService)
+        public ArticleController(ArticleService articleService, UserService userService)
         {
             _articleService = articleService;
+            _userService = userService;
         }
 
         [HttpGet("GetAll")]
@@ -25,6 +27,16 @@ namespace Financio
         public async Task<ActionResult<ArticleOutputDTO>> GetById(string id)
         {
             var article = _articleService.GetArticleByID(id);
+            if (article == null)
+                return NotFound();
+
+            return Ok(article);
+        }
+
+        [HttpGet("GetByIdForUser/{articleID}/{userID}")]
+        public async Task<ActionResult<ArticleOutputDTO>> GetByIdForUser(string articleID, string userID)
+        {
+            var article = _articleService.GetArticleByIDForUser(articleID, userID);
             if (article == null)
                 return NotFound();
 
@@ -52,6 +64,14 @@ namespace Financio
             var result = _articleService.UpdateArticle(article, id);
 
             return Ok(result != null ? result : false);
+        }
+
+        [HttpPost("Like")]
+        public async Task<ActionResult> Like(UserLikeDTO likeDTO)
+        {
+            var result = _userService.AssignLikedArticleToUser(likeDTO.ArticleID, likeDTO.UserID);
+
+            return Ok(result);
         }
 
         [HttpDelete("Delete/{id}")]

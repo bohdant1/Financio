@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using AutoMapper.QueryableExtensions;
+using System.Linq;
 
 namespace Financio
 {
@@ -9,13 +10,16 @@ namespace Financio
     {
         private readonly DBContext _mongoContext;
         private readonly BlobStorageContext _blobContext;
+        private readonly MessageBrokerContext _messageBrokerContext;
+
         private readonly IMapper _mapper;
         private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(DBContext context, BlobStorageContext blobContext, IMapper mapper, ILogger<ArticleService> logger) 
+        public ArticleService(DBContext context, BlobStorageContext blobContext, MessageBrokerContext messageBrokerContext, IMapper mapper, ILogger<ArticleService> logger) 
         {
             this._mongoContext = context;
             this._blobContext = blobContext;
+            this._messageBrokerContext = messageBrokerContext;
             this._blobContext.SetContainer("Article");
             this._mapper = mapper;
             this._logger = logger;
@@ -26,14 +30,17 @@ namespace Financio
             article_entity.Date = DateTime.Now;
             article_entity.Id = ObjectId.GenerateNewId().ToString();
 
-            //TODO: research how to make them synchronous
-            //TODO: add logging
+            //TODO: research how to make them atomic
 
             var uri = _blobContext.Upload(article_entity.Text, article_entity.Id);
 
             article_entity.Text = uri;
 
             _mongoContext.Articles.InsertOne(article_entity);
+
+            //ENDTODO
+
+            _messageBrokerContext.PublishEventArticleCreated(article_entity);
 
             var result = _mapper.Map<ArticleOutputDTO>(article_entity);
 
@@ -124,6 +131,23 @@ namespace Financio
 
             _logger.LogInformation($"Retrieved article by id {id}");
             return _mapper.Map<ArticleOutputDTO>(article_entity);
+        }
+
+        public ArticleOutputDTO GetArticleByIDForUser(string articleID, string userID)
+        {
+            var objectId = ObjectId.Parse(articleID);
+
+            var article_entity = _mongoContext.Articles.Find(x => x.Id == articleID).FirstOrDefault();
+
+            string content = _blobContext.Fetch(article_entity.Text);
+            article_entity.Text = content;
+
+            ArticleOutputDTO outputDTO = _mapper.Map<ArticleOutputDTO>(article_entity);
+            outputDTO.LikedByUser = _mongoContext.Users.Find(x => x.Id == userID).FirstOrDefault().
+                LikedArticles.Contains(ObjectId.Parse(articleID));
+
+            _logger.LogInformation($"Retrieved article by id {articleID}");
+            return outputDTO;
         }
     }
 }
