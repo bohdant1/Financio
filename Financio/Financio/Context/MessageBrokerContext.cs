@@ -29,7 +29,7 @@ namespace Financio
             channel.QueueDeclare(queue: "article_created", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
             string message = JsonSerializer.Serialize(article);
-            var body = Encoding.Unicode.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(message);
 
             channel.BasicPublish(exchange: "", routingKey: "article_created", basicProperties: null, body: body);
             Console.WriteLine("Article created message sent: {0}", message);
