@@ -2,6 +2,8 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@2.2.0
+  sonarcloud: sonarsource/sonarcloud@1.0.3
+
 
 jobs:
   build:
@@ -15,7 +17,18 @@ jobs:
           command: | 
             dotnet restore
             dotnet build
-
+  sonarcloud:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    steps:
+      - checkout
+      - run:
+          working_directory: Financio/Financio
+          name: SonarCloud
+          command: | 
+            dotnet restore
+            dotnet build
+      - sonarcloud/scan
   unit-test:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -70,6 +83,13 @@ workflows:
           requires:
             - build
       - integration-test:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - build
+      - sonarcloud:
           filters:
             branches:
               only:
