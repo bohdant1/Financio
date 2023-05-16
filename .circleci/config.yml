@@ -19,7 +19,7 @@ jobs:
             dotnet build
   sonarcloud:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim
+      - image: mcr.microsoft.com/dotnet/sdk:6.0-alpine3.17
     steps:
       - checkout
       - run:
