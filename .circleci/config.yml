@@ -19,7 +19,7 @@ jobs:
             dotnet build
   sonarcloud:
     docker:
-      - image: jetcipher/circleci-dotnet-core:6.0
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
     steps:
       - checkout
       - run:
