@@ -22,10 +22,10 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: UnitTestProject
+          working_directory: Financio/UnitTestProject
           name: Run unit tests
           command: |
-            # dotnet restore
+            dotnet restore
             dotnet test --filter FullyQualifiedName~UnitTestProject
 
   integration-test:
@@ -34,10 +34,10 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: IntegrationTestProject
+          working_directory: Financio/IntegrationTestProject
           name: Run integration tests
           command: |
-            # dotnet restore
+            dotnet restore
             dotnet test --filter FullyQualifiedName~IntegrationTestProject
 
   build-and-push-image:
