@@ -25,7 +25,7 @@ jobs:
           working_directory: UnitTestProject
           name: Run unit tests
           command: |
-            dotnet restore
+            # dotnet restore
             dotnet test --filter FullyQualifiedName~UnitTestProject
 
   integration-test:
@@ -37,7 +37,7 @@ jobs:
           working_directory: IntegrationTestProject
           name: Run integration tests
           command: |
-            dotnet restore
+            # dotnet restore
             dotnet test --filter FullyQualifiedName~IntegrationTestProject
 
   build-and-push-image:
