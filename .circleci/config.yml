@@ -22,11 +22,11 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: Financio/Financio.Tests
+          working_directory: UnitTestProject
           name: Run unit tests
           command: |
             dotnet restore
-            dotnet test 
+            dotnet test --filter FullyQualifiedName~UnitTestProject
 
   integration-test:
     docker:
@@ -34,11 +34,11 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: Financio/Financio.Tests
+          working_directory: IntegrationTestProject
           name: Run integration tests
           command: |
             dotnet restore
-            dotnet test 
+            dotnet test --filter FullyQualifiedName~IntegrationTestProject
 
   build-and-push-image:
     docker:
