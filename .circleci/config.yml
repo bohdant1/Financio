@@ -26,7 +26,7 @@ jobs:
           name: Run unit tests
           command: |
             dotnet restore
-            dotnet test --filter FullyQualifiedName~UnitTestProject
+            dotnet test 
 
   integration-test:
     docker:
@@ -38,7 +38,7 @@ jobs:
           name: Run integration tests
           command: |
             dotnet restore
-            dotnet test --filter FullyQualifiedName~IntegrationTestProject
+            dotnet test 
 
   build-and-push-image:
     docker:
