@@ -11,10 +11,35 @@ jobs:
       - checkout
       - run:
           working_directory: Financio/Financio
-          name: build solution
+          name: Build solution
           command: | 
             dotnet restore
             dotnet build
+
+  unit-test:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    steps:
+      - checkout
+      - run:
+          working_directory: Financio/Financio.Tests
+          name: Run unit tests
+          command: |
+            dotnet restore
+            dotnet test --filter FullyQualifiedName~UnitTestProject
+
+  integration-test:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    steps:
+      - checkout
+      - run:
+          working_directory: Financio/Financio.Tests
+          name: Run integration tests
+          command: |
+            dotnet restore
+            dotnet test --filter FullyQualifiedName~IntegrationTestProject
+
   build-and-push-image:
     docker:
       - image: docker:20.10.11
@@ -27,19 +52,34 @@ jobs:
           command: |
             docker build -t btymo/btymo-repo:backend .
             docker login --username=btymo --password=$DOCKERHUB_PASSWORD
-            docker push btymo/btymo-repo:backend  
+            docker push btymo/btymo-repo:backend
+
 workflows:
-  workflow: 
+  workflow:
     jobs:
       - build:
           filters:
             branches:
-              only: 
+              only:
                 - main
+      - unit-test:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - build
+      - integration-test:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - build
       - build-and-push-image:
           filters:
             branches:
-              only: 
+              only:
                 - main
-          requires: 
-            - build
+          requires:
+            - integration-test
