@@ -19,7 +19,7 @@ jobs:
             dotnet build
   sonarcloud:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:6.0
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
