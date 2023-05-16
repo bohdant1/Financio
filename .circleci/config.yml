@@ -19,13 +19,13 @@ jobs:
             dotnet build
   sonarcloud:
     docker:
-      - image: circleci/python:3.8
+      - image: jetcipher/circleci-dotnet-core:6.0
     steps:
       - checkout
       - run:
           working_directory: Financio/Financio
           name: SonarCloud
-          command: | 
+          command: 
             dotnet restore
             dotnet build
       - sonarcloud/scan
