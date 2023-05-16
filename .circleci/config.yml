@@ -27,7 +27,6 @@ jobs:
           name: SonarCloud
           command: 
             dotnet restore
-            dotnet build
       - sonarcloud/scan
   unit-test:
     docker:
