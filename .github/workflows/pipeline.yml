@@ -94,5 +94,5 @@ jobs:
         working-directory: Financio
         run: |
           docker build -t btymo/btymo-repo:backend .
-          docker login --username=btymo --password=$DOCKERHUB_PASSWORD
+          docker login --username=btymo --password="${{ secrets.DOCKERHUB_PASSWORD }}"
           docker push btymo/btymo-repo:backend
