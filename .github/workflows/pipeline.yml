@@ -26,7 +26,65 @@ jobs:
         run: |
           dotnet restore
           dotnet build
+          
+#   sonarcloud:
+#     needs: build
+#     runs-on: ubuntu-latest
 
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+
+#       - name: Set up .NET SDK
+#         uses: actions/setup-dotnet@v1
+#         with:
+#           dotnet-version: 6.0.x
+
+#       - name: SonarCloud
+#         working-directory: Financio/Financio
+#         run: dotnet restore
+
+#       - name: SonarCloud Scan
+#         uses: sonarsource/sonarcloud-github-action@v1
+
+  unit-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Run unit tests
+        working-directory: Financio/UnitTestProject
+        run: |
+          dotnet restore
+          dotnet test --filter FullyQualifiedName~UnitTestProject
+
+  integration-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Run integration tests
+        working-directory: Financio/IntegrationTestProject
+        run: |
+          dotnet restore
+          dotnet test --filter FullyQualifiedName~IntegrationTestProject
+          
   build-and-push-image:
     needs: build
     runs-on: ubuntu-latest
@@ -42,6 +100,6 @@ jobs:
       - name: Build Docker image
         working-directory: Financio
         run: |
+          echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
           docker build -t btymo/btymo-repo:backend .
-          docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
           docker push btymo/btymo-repo:backend
