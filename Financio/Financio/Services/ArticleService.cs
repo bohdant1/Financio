@@ -11,16 +11,18 @@ namespace Financio
         private readonly DBContext _mongoContext;
         private readonly BlobStorageContext _blobContext;
         private readonly MessageBrokerContext _messageBrokerContext;
+        private readonly GraphNeo4jContext _graphContext;
 
         private readonly IMapper _mapper;
         private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(DBContext context, BlobStorageContext blobContext, MessageBrokerContext messageBrokerContext, IMapper mapper, ILogger<ArticleService> logger) 
+        public ArticleService(DBContext context, BlobStorageContext blobContext, MessageBrokerContext messageBrokerContext,GraphNeo4jContext graphNeo4JContext, IMapper mapper, ILogger<ArticleService> logger) 
         {
             this._mongoContext = context;
             this._blobContext = blobContext;
             this._messageBrokerContext = messageBrokerContext;
             this._blobContext.SetContainer("Article");
+            this._graphContext= graphNeo4JContext;
             this._mapper = mapper;
             this._logger = logger;
         }
@@ -116,6 +118,29 @@ namespace Financio
             }
 
             _logger.LogInformation($"Retrived all articles from collection {collection_id}");
+
+            return articleDTOs;
+        }
+
+        public async Task<List<ArticleOutputDTO>> GetTimelineAsync(string userID)
+        {
+            // retrieve liked articles from mongo 
+            var user = _mongoContext.Users.Find(x => x.Id == userID).FirstOrDefault();
+            var articles = user.LikedArticles;
+            List<string> articleIds = user.LikedArticles.Select(id => id.ToString()).ToList();
+            // pass them to the graph context function
+            var result = await _graphContext.GetNeighborsWithConnectionCount(articleIds);
+            //find all the articles by id and assemble a list of dtos
+            List<ArticleOutputDTO> articleDTOs = new List<ArticleOutputDTO>();
+            foreach (string id in result)
+            {
+                var article = _mongoContext.Articles.Find(x => x.Id == id).FirstOrDefault();
+                var articleDTO = _mapper.Map<ArticleOutputDTO>(article);
+                articleDTOs.Add(articleDTO);
+            }
+            //return a list of dtos
+
+            _logger.LogInformation($"Retrived recommended articles for user {userID}");
 
             return articleDTOs;
         }
