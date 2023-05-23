@@ -86,7 +86,7 @@ jobs:
           dotnet test --filter FullyQualifiedName~IntegrationTestProject
           
   build-and-push-image:
-    needs: build
+    needs: [unit-test, integration-test]
     runs-on: ubuntu-latest
 
     env:
