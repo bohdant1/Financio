@@ -27,15 +27,7 @@ jobs:
           dotnet restore
           dotnet build
           
-name: SonarCloud
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
-jobs:
-  build:
+  sonarcloud:
     name: Build and analyze
     runs-on: windows-latest
     steps:
@@ -73,7 +65,7 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"FinancioOrg_Financio" /o:"financioorg" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build
+          <insert_your_clean_build_command>
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
           
   unit-test:
