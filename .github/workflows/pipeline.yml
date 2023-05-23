@@ -27,26 +27,22 @@ jobs:
           dotnet restore
           dotnet build
           
-#   sonarcloud:
-#     needs: build
-#     runs-on: ubuntu-latest
+  sonarcloud:
+    needs: build
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-#       - name: Set up .NET SDK
-#         uses: actions/setup-dotnet@v1
-#         with:
-#           dotnet-version: 6.0.x
+      - name: SonarCloud
+        working-directory: Financio/Financio
+        run: dotnet restore
 
-#       - name: SonarCloud
-#         working-directory: Financio/Financio
-#         run: dotnet restore
-
-#       - name: SonarCloud Scan
-#         uses: sonarsource/sonarcloud-github-action@v1
-
+      - name: Run SonarCloud scanner
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   unit-test:
     needs: build
     runs-on: ubuntu-latest
