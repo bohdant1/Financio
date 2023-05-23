@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        projectBaseDir: ${{ github.workspace }/Financio/Financio
+        projectBaseDir: ${{ github.workspace }}/Financio/Financio
         args:
           -Dsonar.projectKey=De-Oefenpraktijk_Frontend
           -Dsonar.organization=de-oefenpraktijk   
