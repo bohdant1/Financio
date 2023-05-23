@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@2.2.0
-  sonarcloud: sonarsource/sonarcloud@1.0.3
 
 
 jobs:
@@ -23,11 +22,30 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: Financio/Financio
-          name: SonarCloud
-          command: 
-            dotnet restore
-      - sonarcloud/scan
+          name: Install SonarScanner
+          command: |
+            VERSION=4.6.2.2472
+            SONAR_TOKEN=$SONAR_TOKEN
+            SCANNER_DIRECTORY=/tmp/cache/scanner
+            export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
+            OS="linux"
+            echo $SONAR_USER_HOME
+
+            if [[ ! -x "$SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner" ]]; then
+              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$VERSION-$OS.zip
+              unzip -qq -o sonar-scanner-cli-$VERSION-$OS.zip -d $SCANNER_DIRECTORY
+            fi
+
+            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
+            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/jre/bin/java
+          
+      # Run SonarScanner
+      - run:
+          name: SonarCloud Analysis
+          command: |
+            $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
+          environment:
+            SONAR_TOKEN: $SONAR_TOKEN
   unit-test:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:6.0
