@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build solution
+        working-directory: Financio/Financio
+        run: |
+          dotnet restore
+          dotnet build
+
+#   sonarcloud:
+#     needs: build
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+
+#       - name: Set up .NET SDK
+#         uses: actions/setup-dotnet@v1
+#         with:
+#           dotnet-version: 6.0.x
+
+#       - name: SonarCloud
+#         working-directory: Financio/Financio
+#         run: dotnet restore
+
+#       - name: SonarCloud Scan
+#         uses: sonarsource/sonarcloud-github-action@v1
+
+  unit-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Run unit tests
+        working-directory: Financio/UnitTestProject
+        run: |
+          dotnet restore
+          dotnet test --filter FullyQualifiedName~UnitTestProject
+
+  integration-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Run integration tests
+        working-directory: Financio/IntegrationTestProject
+        run: |
+          dotnet restore
+          dotnet test --filter FullyQualifiedName~IntegrationTestProject
+
+  build-and-push-image:
+    needs: integration-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        working-directory: Financio
+        run: |
+          docker build -t btymo/btymo-repo:backend .
+          docker login --username=btymo --password=$DOCKERHUB_PASSWORD
+          docker push btymo/btymo-repo:backend
