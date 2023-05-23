@@ -32,14 +32,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        projectBaseDir: Financio/Financio
-        fetch-depth: 0
+        projectBaseDir: ${{ github.workspace }/Financio/Financio
+        args:
+          -Dsonar.projectKey=De-Oefenpraktijk_Frontend
+          -Dsonar.organization=de-oefenpraktijk   
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
+         
   unit-test:
     needs: build
     runs-on: ubuntu-latest
