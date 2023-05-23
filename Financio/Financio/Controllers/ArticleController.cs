@@ -50,6 +50,13 @@ namespace Financio
             return Ok(articles);
         }
 
+        [HttpGet("GetTimeline/{id}")]
+        public async Task<ActionResult<ArticleOutputDTO>> GetTimeline(string id)
+        {
+            var articles = await _articleService.GetTimelineAsync(id);
+            return Ok(articles);
+        }
+
         [HttpPost("Create")]
         public async Task<ActionResult> Create(ArticleInputDTO article)
         {
