@@ -96,5 +96,5 @@ jobs:
         working-directory: Financio
         run: |
           echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-          docker build -t btymo/btymo-repo:backend .
-          docker push btymo/btymo-repo:backend
+          docker build -t btymo/financio-api:latest .
+          docker push btymo/financio-api:latest
