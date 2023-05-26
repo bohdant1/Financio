@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_9ad2ffc2b67c4949ace3c69dd39078eb }}/btymo/financio-api:${{ github.sha }}
-        file: ./Dockerfile
+        file: Financio/Financio/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
