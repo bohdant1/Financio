@@ -17,13 +17,13 @@ namespace Financio
         {
             _configuration = configuration;
             connectionString = _configuration.GetValue<string>("MessageBroker:ConnectionString");
-            username = _configuration.GetValue<string>("MessageBroker:Username");
-            password = _configuration.GetValue<string>("MessageBroker:Password");
+            //username = _configuration.GetValue<string>("MessageBroker:Username");
+            //password = _configuration.GetValue<string>("MessageBroker:Password");
         }
 
         public void PublishEventArticleCreated(Article article)
         {
-            var factory = new ConnectionFactory() { HostName = connectionString, UserName = username, Password = password };
+            var factory = new ConnectionFactory{ Uri = new Uri(connectionString) };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
             channel.QueueDeclare(queue: "article_created", durable: false, exclusive: false, autoDelete: false, arguments: null);
