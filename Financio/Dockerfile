@@ -6,14 +6,14 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Financio/Financio.csproj", "Financio/"]
+COPY ["Financio/Financio/Financio.csproj", "Financio/"]
 RUN dotnet restore "Financio/Financio.csproj"
 COPY . .
 WORKDIR "/src/Financio"
-RUN dotnet build "Financio.csproj" -c Release -o /app/build
+RUN dotnet build "Financio/Financio.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Financio.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Financio/Financio.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
