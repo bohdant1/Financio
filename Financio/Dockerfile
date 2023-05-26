@@ -6,7 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Financio/Financio.csproj", "Financio/"]
+COPY ["Financio/Financio/Financio.csproj", "Financio/"]
 RUN dotnet restore "Financio/Financio.csproj"
 COPY . .
 WORKDIR "/src/Financio"
