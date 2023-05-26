@@ -17,9 +17,6 @@ namespace Financio.Controllers
         public async Task<ActionResult<CollectionOutputDTO>> GetAll()
         {
             var collections = _collectionService.GetAllCollections();
-            //TOBEREMOVED 
-            collections[0].Name += "__HelloBohdanOnceMoreMore";
-            //ENDTOBEREMOVED
             return Ok(collections);
         }
 
