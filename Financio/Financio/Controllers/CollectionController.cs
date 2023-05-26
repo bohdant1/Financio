@@ -18,7 +18,7 @@ namespace Financio.Controllers
         {
             var collections = _collectionService.GetAllCollections();
             //TOBEREMOVED
-            collections[0].Name += "__HelloBohdan";
+            collections[0].Name += "__HelloBohdanOnceMore";
             //ENDTOBEREMOVED
             return Ok(collections);
         }
