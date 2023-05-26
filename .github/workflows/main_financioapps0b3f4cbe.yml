@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_9ad2ffc2b67c4949ace3c69dd39078eb }}/btymo/financio-api:${{ github.sha }}
+        tags: index.docker.io/btymo/financio-api:${{ github.sha }}
         file: Financio/Dockerfile
 
   deploy:
@@ -48,4 +48,4 @@ jobs:
         app-name: 'financioapps0b3f4cbe'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6dbe71238e51436eb28be7cd1d780ca4 }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_9ad2ffc2b67c4949ace3c69dd39078eb }}/btymo/financio-api:${{ github.sha }}'
+        images: 'index.docker.io/btymo/financio-api:${{ github.sha }}'
