@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_8fa9992a6b1744cf92d407511432bdc8 }}/financio-api:${{ github.sha }}
-        file: ./Dockerfile
+        file: Financio/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
