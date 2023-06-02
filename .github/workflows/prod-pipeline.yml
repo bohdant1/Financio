@@ -107,42 +107,27 @@ jobs:
           dotnet restore
           dotnet test --filter FullyQualifiedName~IntegrationTestProject
           
-  build-image:
-    runs-on: 'ubuntu-latest'
-    needs:  [integration-test, unit-test]
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to registry
-      uses: docker/login-action@v2
-      with:
-        registry: https://index.docker.io/v1/
-        username: btymo
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-    - name: Build and push container image to registry
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: index.docker.io/btymo/financio-api:${{ github.sha }}
-        file: Financio/Dockerfile
-
-  deploy:
+  build-and-deploy:
+    needs: [integration-test, unit-test]
     runs-on: ubuntu-latest
-    needs:  build-image
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'financioapps0b3f4cbe'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_6dbe71238e51436eb28be7cd1d780ca4 }}
-        images: 'index.docker.io/btymo/financio-api:${{ github.sha }}'
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.FINANCIOAPIEE82_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }}/Financio 
+          registryUrl: docker.io
+          registryUsername: ${{ secrets.FINANCIOAPIEE82_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.FINANCIOAPIEE82_REGISTRY_PASSWORD }}
+          containerAppName: financioapiee82
+          resourceGroup: DefaultResourceGroup-WEU
+          imageToBuild: btymo/financio-api:${{ github.sha }}
+          dockerfilePath: Dockerfile
